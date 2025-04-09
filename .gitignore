@@ -1,6 +1,2 @@
 .vscode/
 build/
-
-bin/
-src/
-include/
