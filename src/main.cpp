@@ -8,32 +8,34 @@ int main()
     // Create the main window
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML game");
     Sprite2d sp("assets/sprite/teddy/01-Idle/01-Idle");
-    // sp.setPosition({400, 300}); // Set the position of the sprite
-    // Main game loop
+
     sf::Clock clock; // This clock will track the time elapsed
     while (window.isOpen())
     {
         // Calculate delta time
-        sf::Time deltaTime = clock.restart(); // Restart the clock and get the elapsed time
-        float delta = deltaTime.asSeconds();  // Convert to seconds
+        sf::Time deltaTime = clock.restart();
+        float delta = deltaTime.asSeconds();
 
         // Process events
-        while (const std::optional<sf::Event> event = window.pollEvent())
+        std::optional<sf::Event> event;
+        while (auto ev = window.pollEvent())
         {
+            event = ev; // Store the latest event (if any occurred this frame)
             if (event->is<sf::Event::Closed>())
                 window.close();
+            // You can handle other global events here if needed
         }
 
-        // Clear the screen
+        // Clear the screen (do this ONCE per frame, AFTER processing all events)
         window.clear(sf::Color::Black);
 
         // Draw the shape
-        sp.update(delta);
+        sp.update(event, delta); // Pass the last polled event (or std::nullopt if no event occurred)
         sp.draw(window);
 
-        // Update the window
+        // Update the window (do this ONCE per frame, AFTER drawing everything)
         window.display();
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

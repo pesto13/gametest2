@@ -11,10 +11,10 @@ public:
     Sprite2d(const std::string &folderPath);
 
     // Cambia la texture in base al tempo
-    void update(float deltaTime);
+    void update(const std::optional<sf::Event> event, float deltaTime);
     void draw(sf::RenderWindow &window);
     void setPosition(sf::Vector2<float> position); // Prova a spostare lo sprite
-    // void move
+    void input(float deltaTime);                   // Prova a gestire gli input
 
 private:
     sf::Texture defaultTexture;        // Membro per texture predefinita TODO mi pare una merda
@@ -23,7 +23,5 @@ private:
     size_t currentFrame = 0;           // Indice del frame attuale
     float elapsedTime = 0.0f;          // Tempo accumulato per il cambio frame
     float frameTime = 0.1f;            // Tempo tra un frame e l'altro (100ms)
-    // sf::Vector2f position;             // Posizione dello sprite
-    // sf::Vector2f direction;            // Direzione dello sprite
-    // sf::Vector2f velocity;             // Velocità dello sprite
+    float velocity = 40.0f;            // Velocità dello sprite
 };
