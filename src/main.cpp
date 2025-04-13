@@ -30,7 +30,7 @@ int main()
         window.clear(sf::Color::Black);
 
         // Draw the shape
-        sp.update(event, delta); // Pass the last polled event (or std::nullopt if no event occurred)
+        sp.update(delta); // Pass the last polled event (or std::nullopt if no event occurred)
         sp.draw(window);
 
         // Update the window (do this ONCE per frame, AFTER drawing everything)
