@@ -3,22 +3,22 @@
 #include <iostream>
 #include <cmath>
 
-Sprite2d::Sprite2d(const std::string &folderPath)
+Sprite2d::Sprite2d(std::vector<std::string> folderPath)
     : sprite(defaultTexture, {{0, 0}, {450, 523}})
 {
-    textures = AssetLoader::loadTexturesFromFolder(folderPath);
+    textures[State::IDLE] = AssetLoader::loadTexturesFromFolder(folderPath[0]);
+    textures[State::WALKING] = AssetLoader::loadTexturesFromFolder(folderPath[1]);
     if (!textures.empty())
     {
-        sprite.setTexture(textures[0]); // Imposta la texture desiderata
+        sprite.setTexture(textures[State::IDLE][0]); // Imposta la texture desiderata
     }
     else
     {
-        std::cerr << "Errore: Nessuna texture caricata da " << folderPath << std::endl;
+        std::cerr << "Errore: Nessuna texture caricata da " << folderPath[0] << std::endl;
         // Potresti voler considerare di usare 'defaultTexture' in questo caso
     }
 
     sprite.scale({0.5f, 0.5f}); // Scala lo sprite a metà dimensione
-    std::cout << "Origin X: " << sprite.getOrigin().x << ", Origin Y: " << sprite.getOrigin().y << std::endl;
 }
 
 void Sprite2d::update(float deltaTime)
@@ -31,9 +31,9 @@ void Sprite2d::update(float deltaTime)
     elapsedTime += deltaTime;
     if (elapsedTime >= frameTime)
     {
-        elapsedTime = 0.0f;                                  // Resetta il tempo accumulato
-        currentFrame = (currentFrame + 1) % textures.size(); // Passa al frame successivo ciclicamente
-        sprite.setTexture(textures[currentFrame]);
+        elapsedTime = 0.0f;                                                // Resetta il tempo accumulato
+        currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
+        sprite.setTexture(textures[currentState][currentFrame]);
     }
 }
 
@@ -73,6 +73,20 @@ void Sprite2d::input(float deltaTime)
         direction.x = -1;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
         direction.x = 1;
+
+    if (direction.x != 0 || direction.y != 0)
+    {
+        currentState = State::WALKING; // Set the state to WALKING if any key is pressed
+    }
+    else
+    {
+        currentState = State::IDLE; // Set the state to IDLE if no keys are pressed
+    }
+
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
+    // {
+    //     currentState = State::JUMPING; // Set the state to JUMPING if the space key is pressed
+    // }
 
     // Normalize the direction vector to ensure consistent speed in all directions
     sprite.move(velocity * normalize(direction) * deltaTime);

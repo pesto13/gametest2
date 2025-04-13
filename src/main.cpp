@@ -7,7 +7,7 @@ int main()
 {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFML game");
-    Sprite2d sp("assets/sprite/teddy/01-Idle/01-Idle");
+    Sprite2d sp({"assets/sprite/teddy/01-Idle/01-Idle", "assets/sprite/teddy/03-Walk/02-Walk_Happy"});
 
     sf::Clock clock; // This clock will track the time elapsed
     while (window.isOpen())
