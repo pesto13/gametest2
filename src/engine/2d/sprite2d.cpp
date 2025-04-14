@@ -18,7 +18,8 @@ Sprite2d::Sprite2d(std::vector<std::string> folderPath)
         // Potresti voler considerare di usare 'defaultTexture' in questo caso
     }
 
-    sprite.scale({0.5f, 0.5f}); // Scala lo sprite a metà dimensione
+    sprite.scale({scaleFactor, scaleFactor});                                                     // Scala lo sprite a metà dimensione
+    sprite.setOrigin({sprite.getGlobalBounds().size.x / 2, sprite.getGlobalBounds().size.y / 2}); // Imposta l'origine al centro dello sprite
 }
 
 void Sprite2d::update(float deltaTime)
@@ -34,6 +35,8 @@ void Sprite2d::update(float deltaTime)
         elapsedTime = 0.0f;                                                // Resetta il tempo accumulato
         currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
         sprite.setTexture(textures[currentState][currentFrame]);
+
+        sprite.setScale(sf::Vector2f(isRight ? -scaleFactor : scaleFactor, scaleFactor));
     }
 }
 
@@ -70,9 +73,15 @@ void Sprite2d::input(float deltaTime)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
         direction.y = 1;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+    {
         direction.x = -1;
+        isRight = false; // Set the direction to down if 'A' is pressed
+    }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+    {
         direction.x = 1;
+        isRight = true; // Set the direction to right if 'D' is pressed
+    }
 
     if (direction.x != 0 || direction.y != 0)
     {

@@ -33,4 +33,6 @@ private:
     float frameTime = 0.05f;                                      // Tempo tra un frame e l'altro (100ms)
     float velocity = 500.0f;                                      // Velocità dello sprite
     State currentState = State::IDLE;                             // Stato attuale dello sprite
+    bool isRight = false;                                         // Direzione dello sprite (true = destra, false = sinistra)
+    float scaleFactor = 0.5f;                                     // Fattore di scala dello sprite
 };
