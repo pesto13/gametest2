@@ -18,16 +18,17 @@ Sprite2d::Sprite2d(std::vector<std::string> folderPath)
         // Potresti voler considerare di usare 'defaultTexture' in questo caso
     }
 
-    sprite.scale({scaleFactor, scaleFactor});                                                     // Scala lo sprite a metà dimensione
-    sprite.setOrigin({sprite.getGlobalBounds().size.x / 2, sprite.getGlobalBounds().size.y / 2}); // Imposta l'origine al centro dello sprite
+    sprite.scale({scaleFactor, scaleFactor}); // Scala lo sprite a metà dimensione
+    // TODO: fix origin for mirroring
+    // sprite.setOrigin({sprite.getGlobalBounds().size.x / 2, sprite.getGlobalBounds().size.y / 2}); // Imposta l'origine al centro dello sprite
 }
 
 void Sprite2d::update(float deltaTime)
 {
     if (textures.empty())
-        return;
 
-    input(deltaTime);
+        return;
+    // input(deltaTime);
 
     elapsedTime += deltaTime;
     if (elapsedTime >= frameTime)
@@ -36,13 +37,28 @@ void Sprite2d::update(float deltaTime)
         currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
         sprite.setTexture(textures[currentState][currentFrame]);
 
-        sprite.setScale(sf::Vector2f(isRight ? -scaleFactor : scaleFactor, scaleFactor));
+        // TODO: fix origin for mirroring
+        // sprite.setScale(sf::Vector2f(isRight ? -scaleFactor : scaleFactor, scaleFactor));
     }
 }
 
 void Sprite2d::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+}
+
+void Sprite2d::drawWithOutline(sf::RenderWindow &window, sf::Color outlineColor, float outlineThickness) const
+{
+    sf::FloatRect bounds = sprite.getGlobalBounds();
+    sf::RectangleShape outlineRect;
+    outlineRect.setPosition(sprite.getPosition());
+    outlineRect.setSize(sprite.getGlobalBounds().size);
+    outlineRect.setFillColor(sf::Color::Transparent); // Riempiimento trasparente
+    outlineRect.setOutlineColor(outlineColor);
+    outlineRect.setOutlineThickness(outlineThickness); // Spessore del contorno (regola a piacere)
+
+    window.draw(sprite);      // Disegna prima il teddy
+    window.draw(outlineRect); // Poi disegna il rettangolo di contorno
 }
 
 void Sprite2d::setPosition(sf::Vector2<float> position)

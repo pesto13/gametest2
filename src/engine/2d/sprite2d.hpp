@@ -21,8 +21,13 @@ public:
 
     void update(float deltaTime);
     void draw(sf::RenderWindow &window);
+    void drawWithOutline(sf::RenderWindow &window, sf::Color outlineColor, float outlineThickness) const;
     void setPosition(sf::Vector2<float> position); // Prova a spostare lo sprite
     void input(float deltaTime);                   // Prova a gestire gli input
+    sf::Sprite getSprite() { return sprite; }      // Restituisce lo sprite
+
+    void setVelocity(float newVelocity) { velocity = newVelocity; } // Imposta la velocità dello sprite
+    float getVelocity() const { return velocity; }                  // Restituisce la velocità dello sprite
 
 private:
     sf::Texture defaultTexture;                                   // Membro per texture predefinita TODO mi pare una merda
