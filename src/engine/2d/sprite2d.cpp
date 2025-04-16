@@ -36,10 +36,20 @@ void Sprite2d::update(float deltaTime)
         elapsedTime = 0.0f;                                                // Resetta il tempo accumulato
         currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
         sprite.setTexture(textures[currentState][currentFrame]);
-
         // TODO: fix origin for mirroring
         // sprite.setScale(sf::Vector2f(isRight ? -scaleFactor : scaleFactor, scaleFactor));
     }
+
+    if (!isGrounded)
+    {
+        velocity.y += gravity * deltaTime;
+    }
+
+    // Aggiorna la posizione basata sulla velocità
+    sf::Vector2f currentPosition = sprite.getPosition();
+    currentPosition.x += velocity.x * deltaTime;
+    currentPosition.y += velocity.y * deltaTime;
+    sprite.setPosition(currentPosition);
 }
 
 void Sprite2d::draw(sf::RenderWindow &window)
@@ -81,38 +91,42 @@ sf::Vector2f normalize(const sf::Vector2f &vector)
 
 void Sprite2d::input(float deltaTime)
 {
-    sf::Vector2f direction(0, 0); // Initialize direction to zero
-
     // Check the *current state* of the keyboard keys
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-        direction.y = -1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-        direction.y = 1;
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+    //     direction.y = -1;
+    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+    //     direction.y = 1;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
     {
-        direction.x = -1;
-        isRight = false; // Set the direction to down if 'A' is pressed
+        velocity.x = -teddy::lateralVelocity; // Move left
+        isRight = false;                      // Set the direction to down if 'A' is pressed
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
     {
-        direction.x = 1;
+        velocity.x = teddy::lateralVelocity;
         isRight = true; // Set the direction to right if 'D' is pressed
     }
-
-    if (direction.x != 0 || direction.y != 0)
+    else
     {
-        currentState = State::WALKING; // Set the state to WALKING if any key is pressed
+        velocity.x = 0; // Stop horizontal movement if no keys are pressed
+    }
+
+    if (velocity.x != 0)
+    {
+        currentState = State::WALKING;
     }
     else
     {
         currentState = State::IDLE; // Set the state to IDLE if no keys are pressed
     }
 
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-    // {
-    //     currentState = State::JUMPING; // Set the state to JUMPING if the space key is pressed
-    // }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && isGrounded)
+    {
+        velocity.y = jumpForce; // Apply the jump force
+        isGrounded = false;     // Set isGrounded to false when jumping
+        // currentState = State::JUMPING; // Set the state to JUMPING if the space key is pressed
+    }
 
     // Normalize the direction vector to ensure consistent speed in all directions
-    sprite.move(velocity * normalize(direction) * deltaTime);
+    // sprite.move(velocity.x * normalize(velocity) * deltaTime);
 }

@@ -12,10 +12,10 @@ void CollisionSystem::checkCollisions(Sprite2d &entity, const std::vector<sf::Re
         sf::FloatRect obstacleBounds = obstacle.getGlobalBounds();
         if (std::optional<sf::FloatRect> intersection; intersection = entityBounds.findIntersection(obstacleBounds))
         {
+            entity.setGrounded(true); // Resetta lo stato di "a terra" se c'è una collisione
             resolveCollisionWithIntersection(entity, obstacleBounds, intersection.value());
             break; // O gestisci più collisioni
         }
-        entity.setVelocity(500.0f); // Reset velocity if no collision
     }
 }
 
@@ -39,9 +39,5 @@ void CollisionSystem::resolveCollisionWithIntersection(Sprite2d &entity, const s
     {
         correction.y = (entityCenter.y < otherCenter.y) ? -overlap.y : overlap.y;
     }
-    std::cout << "Position Before: " << entityPos.x << ", " << entityPos.y << std::endl;
     entity.setPosition(entityPos + correction);
-    entity.setVelocity(0.0f);
-    std::cout << "Position After: " << entity.getSprite().getPosition().x << ", " << entity.getSprite().getPosition().y << std::endl;
-    // Imposta la velocità a zero su entrambi gli assi
 }
