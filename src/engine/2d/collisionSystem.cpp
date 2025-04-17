@@ -12,6 +12,7 @@ void CollisionSystem::checkCollisions(Sprite2d &entity, const std::vector<sf::Re
         sf::FloatRect obstacleBounds = obstacle.getGlobalBounds();
         if (std::optional<sf::FloatRect> intersection; intersection = entityBounds.findIntersection(obstacleBounds))
         {
+            std::cout << "Collision detected!" << std::endl;
             entity.setGrounded(true); // Resetta lo stato di "a terra" se c'è una collisione
             resolveCollisionWithIntersection(entity, obstacleBounds, intersection.value());
             break; // O gestisci più collisioni

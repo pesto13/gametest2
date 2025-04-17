@@ -4,6 +4,9 @@
 - terrain
 
 
+# Obbiettivo di oggi
+- fare inversione dx sx smooth
+
 # Loop
 - window.clear(sf::Color::Black);
 - update(obj)

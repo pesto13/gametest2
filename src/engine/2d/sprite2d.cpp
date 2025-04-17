@@ -4,8 +4,9 @@
 #include <cmath>
 
 Sprite2d::Sprite2d(std::vector<std::string> folderPath)
-    : sprite(defaultTexture, {{0, 0}, {450, 523}})
+    : sprite(defaultTexture, {{0, 0}, {330, 523}})
 {
+    sprite.setOrigin({sprite.getLocalBounds().size.x / 2.f, sprite.getLocalBounds().size.y / 2.f});
     textures[State::IDLE] = AssetLoader::loadTexturesFromFolder(folderPath[0]);
     textures[State::WALKING] = AssetLoader::loadTexturesFromFolder(folderPath[1]);
     if (!textures.empty())
@@ -18,9 +19,8 @@ Sprite2d::Sprite2d(std::vector<std::string> folderPath)
         // Potresti voler considerare di usare 'defaultTexture' in questo caso
     }
 
-    sprite.scale({scaleFactor, scaleFactor}); // Scala lo sprite a metà dimensione
+    // sprite.scale({scaleFactor, scaleFactor}); // Scala lo sprite a metà dimensione
     // TODO: fix origin for mirroring
-    // sprite.setOrigin({sprite.getGlobalBounds().size.x / 2, sprite.getGlobalBounds().size.y / 2}); // Imposta l'origine al centro dello sprite
 }
 
 void Sprite2d::update(float deltaTime)
@@ -29,16 +29,16 @@ void Sprite2d::update(float deltaTime)
 
         return;
     // input(deltaTime);
-
+    // sprite.setOrigin(sprite.getGlobalBounds().getCenter()); // Imposta l'origine al centro dello sprite
     elapsedTime += deltaTime;
     if (elapsedTime >= frameTime)
     {
         elapsedTime = 0.0f;                                                // Resetta il tempo accumulato
         currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
         sprite.setTexture(textures[currentState][currentFrame]);
-        // TODO: fix origin for mirroring
-        // sprite.setScale(sf::Vector2f(isRight ? -scaleFactor : scaleFactor, scaleFactor));
     }
+    float scaleX = isRight ? -scaleFactor : scaleFactor;
+    sprite.setScale({scaleX, scaleFactor}); // scaleFactor è la scala Y (mantieni l'altezza)
 
     if (!isGrounded)
     {
@@ -59,16 +59,20 @@ void Sprite2d::draw(sf::RenderWindow &window)
 
 void Sprite2d::drawWithOutline(sf::RenderWindow &window, sf::Color outlineColor, float outlineThickness) const
 {
+    sf::CircleShape circle(5.f);
     sf::FloatRect bounds = sprite.getGlobalBounds();
     sf::RectangleShape outlineRect;
-    outlineRect.setPosition(sprite.getPosition());
+
+    circle.setPosition(sprite.getGlobalBounds().getCenter());
+    outlineRect.setPosition(sprite.getGlobalBounds().position);
     outlineRect.setSize(sprite.getGlobalBounds().size);
     outlineRect.setFillColor(sf::Color::Transparent); // Riempiimento trasparente
     outlineRect.setOutlineColor(outlineColor);
     outlineRect.setOutlineThickness(outlineThickness); // Spessore del contorno (regola a piacere)
-
-    window.draw(sprite);      // Disegna prima il teddy
-    window.draw(outlineRect); // Poi disegna il rettangolo di contorno
+    circle.setFillColor(sf::Color::Red);               // Colore del cerchio (regola a piacere)
+    window.draw(sprite);                               // Disegna prima il teddy
+    window.draw(outlineRect);                          // Poi disegna il rettangolo di contorno
+    window.draw(circle);                               // Disegna il cerchio al centro del teddy
 }
 
 void Sprite2d::setPosition(sf::Vector2<float> position)

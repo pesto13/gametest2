@@ -7,14 +7,14 @@
 int main()
 {
     // Create the main window
-    sf::RenderWindow window(sf::VideoMode({1000, 800}), "SFML game");
+    sf::RenderWindow window(sf::VideoMode({1000, 1000}), "SFML game");
 
     Sprite2d teddy({"assets/sprite/teddy/01-Idle/01-Idle", "assets/sprite/teddy/03-Walk/02-Walk_Happy"});
-    teddy.setPosition({400, 300}); // Set the initial position of the sprite
+    teddy.setPosition({800, 500}); // Set the initial position of the sprite
 
     sf::RectangleShape ground({1000.0f, 50.0f}); // Larghezza pari alla finestra, altezza di 50 pixel
     ground.setFillColor(sf::Color::Green);       // Colore del terreno
-    ground.setPosition({0.0f, 750.0f});          // Posizionato alla base della finestra (800 - 50)
+    ground.setPosition({0.0f, 900.0f});          // Posizionato alla base della finestra (800 - 50)
 
     sf::RectangleShape rect({200, 50});
     rect.setFillColor(sf::Color::Red); // Set the color of the rectangle
@@ -53,7 +53,10 @@ int main()
         window.draw(ground); // Draw the rectangle
 
         // Update the window (do this ONCE per frame, AFTER drawing everything)
-        window.display();
+        // window.display();
+        // std::cout << teddy.getisGrounded() << std::endl; // Print the grounded state of the sprite
+        // std::cout << "Velocity: " << teddy.getVelocity().x << ", " << teddy.getVelocity().y << std::endl; // Print the velocity of the sprite
+        window.display(); // Display the contents of the window
     }
 
     return EXIT_SUCCESS;
