@@ -33,6 +33,7 @@ void CollisionSystem::resolveCollisionWithIntersection(Sprite2d &entity, const s
     if (overlap.x < overlap.y) // Collisione orizzontale
     {
         correction.x = (entityCenter.x < otherCenter.x) ? -overlap.x : overlap.x;
+        entity.setVelocity({0.0f, entity.getVelocity().y}); // Azzerare la velocità orizzontale
     }
     else // Collisione verticale
     {
@@ -43,6 +44,8 @@ void CollisionSystem::resolveCollisionWithIntersection(Sprite2d &entity, const s
             // la correzione necessaria per separarli sull'asse Y è verso l'alto
             // e pari alla sovrapposizione verticale (con segno negativo).
             correction.y = -overlap.y;
+            entity.setVelocity({entity.getVelocity().x, 0.0f}); // Azzerare la velocità verticale
+            entity.setGrounded(true);                           // Imposta "a terra"
         }
     }
     entity.setPosition(entityPos + correction);
