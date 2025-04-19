@@ -18,7 +18,7 @@ int main()
 
     sf::RectangleShape rect({200, 50});
     rect.setFillColor(sf::Color::Red); // Set the color of the rectangle
-    rect.setPosition({100, 100});      // Set the position of the rectangle
+    rect.setPosition({100, 500});      // Set the position of the rectangle
 
     CollisionSystem collisionSystem;                            // Create an instance of the collision system
     std::vector<sf::RectangleShape> obstacles = {rect, ground}; // List of obstacles (rectangles)
