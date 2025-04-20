@@ -131,6 +131,14 @@ void Sprite2d::input(float deltaTime)
         // currentState = State::JUMPING; // Set the state to JUMPING if the space key is pressed
     }
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
+        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+    {
+        setGrounded(false);
+    }
+
     // Normalize the direction vector to ensure consistent speed in all directions
     // sprite.move(velocity.x * normalize(velocity) * deltaTime);
 }
