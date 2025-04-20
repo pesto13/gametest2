@@ -1,60 +1,60 @@
+#include <SFML/Graphics.hpp>
 #include "sprite2d.hpp"
 #include "../utils/assetLoader.hpp"
 #include <iostream>
-#include <cmath>
 
-Sprite2d::Sprite2d(std::vector<std::string> folderPath)
+Sprite2d::Sprite2d(const std::map<AnimationState, std::string> &animationFolders)
     : sprite(defaultTexture, {{0, 0}, {330, 523}})
 {
     sprite.setOrigin({sprite.getLocalBounds().size.x / 2.f, sprite.getLocalBounds().size.y / 2.f});
-    textures[State::IDLE] = AssetLoader::loadTexturesFromFolder(folderPath[0]);
-    textures[State::WALKING] = AssetLoader::loadTexturesFromFolder(folderPath[1]);
-    if (!textures.empty())
+
+    for (const auto &pair : animationFolders)
     {
-        sprite.setTexture(textures[State::IDLE][0]); // Imposta la texture desiderata
-    }
-    else
-    {
-        std::cerr << "Errore: Nessuna texture caricata da " << folderPath[0] << std::endl;
-        // Potresti voler considerare di usare 'defaultTexture' in questo caso
+        textures[pair.first] = AssetLoader::loadTexturesFromFolder(pair.second);
+        if (textures[pair.first].empty() && !pair.second.empty())
+        {
+            std::cerr << "Errore: Nessuna texture caricata da " << pair.second << " per lo stato " << static_cast<int>(pair.first) << std::endl;
+            // Potresti voler caricare una texture di fallback qui
+        }
     }
 
-    // sprite.scale({scaleFactor, scaleFactor}); // Scala lo sprite a metà dimensione
-    // TODO: fix origin for mirroring
+    // TODO
+    // // Imposta la texture iniziale se ci sono animazioni
+    // if (!textures.empty() && !textures[AnimationState::IDLE].empty())
+    // {
+    //     sprite.setTexture(textures[AnimationState::IDLE][0]);
+    // }
+
+    sprite.setScale({scaleFactor, scaleFactor});
 }
 
 void Sprite2d::update(float deltaTime)
 {
-    if (textures.empty())
-
+    onPreUpdate(deltaTime);
+    if (textures.empty() || textures[currentState].empty())
         return;
-    // input(deltaTime);
-    // sprite.setOrigin(sprite.getGlobalBounds().getCenter()); // Imposta l'origine al centro dello sprite
+
     elapsedTime += deltaTime;
     if (elapsedTime >= frameTime)
     {
-        elapsedTime = 0.0f;                                                // Resetta il tempo accumulato
-        currentFrame = (currentFrame + 1) % textures[currentState].size(); // Passa al frame successivo ciclicamente
+        elapsedTime = 0.0f;
+        currentFrame = (currentFrame + 1) % textures[currentState].size();
         sprite.setTexture(textures[currentState][currentFrame]);
     }
-    float scaleX = isRight ? -scaleFactor : scaleFactor;
-    sprite.setScale({scaleX, scaleFactor}); // scaleFactor è la scala Y (mantieni l'altezza)
 
-    if (!isGrounded)
-    {
-        velocity.y += gravity * deltaTime;
-    }
-
-    // Aggiorna la posizione basata sulla velocità
-    sf::Vector2f currentPosition = sprite.getPosition();
-    currentPosition.x += velocity.x * deltaTime;
-    currentPosition.y += velocity.y * deltaTime;
-    sprite.setPosition(currentPosition);
+    float scaleX = isMirrored ? -scaleFactor : scaleFactor;
+    sprite.setScale({scaleX, scaleFactor});
+    onPostUpdate(deltaTime);
 }
 
 void Sprite2d::draw(sf::RenderWindow &window)
 {
     window.draw(sprite);
+}
+
+void Sprite2d::setPosition(sf::Vector2<float> position)
+{
+    sprite.setPosition(position);
 }
 
 void Sprite2d::drawWithOutline(sf::RenderWindow &window, sf::Color outlineColor, float outlineThickness) const
@@ -75,70 +75,20 @@ void Sprite2d::drawWithOutline(sf::RenderWindow &window, sf::Color outlineColor,
     window.draw(circle);                               // Disegna il cerchio al centro del teddy
 }
 
-void Sprite2d::setPosition(sf::Vector2<float> position)
+void Sprite2d::setAnimationState(AnimationState state)
 {
-    sprite.setPosition(position);
-}
-
-sf::Vector2f normalize(const sf::Vector2f &vector)
-{
-    float length = std::sqrt(vector.x * vector.x + vector.y * vector.y);
-    if (length != 0.0f)
+    if (currentState != state && textures.count(state))
     {
-        return sf::Vector2f(vector.x / length, vector.y / length);
-    }
-    else
-    {
-        return sf::Vector2f(0.0f, 0.0f); // Evita la divisione per zero
+        currentState = state;
+        currentFrame = 0; // Resetta l'animazione quando cambia lo stato
+        if (!textures[currentState].empty())
+        {
+            sprite.setTexture(textures[currentState][0]);
+        }
     }
 }
 
-void Sprite2d::input(float deltaTime)
+sf::Sprite &Sprite2d::getSprite()
 {
-    // Check the *current state* of the keyboard keys
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-    //     direction.y = -1;
-    // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-    //     direction.y = 1;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-    {
-        velocity.x = -teddy::lateralVelocity; // Move left
-        isRight = false;                      // Set the direction to down if 'A' is pressed
-    }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-    {
-        velocity.x = teddy::lateralVelocity;
-        isRight = true; // Set the direction to right if 'D' is pressed
-    }
-    else
-    {
-        velocity.x = 0; // Stop horizontal movement if no keys are pressed
-    }
-
-    if (velocity.x != 0)
-    {
-        currentState = State::WALKING;
-    }
-    else
-    {
-        currentState = State::IDLE; // Set the state to IDLE if no keys are pressed
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && isGrounded)
-    {
-        velocity.y = jumpForce; // Apply the jump force
-        isGrounded = false;     // Set isGrounded to false when jumping
-        // currentState = State::JUMPING; // Set the state to JUMPING if the space key is pressed
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-    {
-        setGrounded(false);
-    }
-
-    // Normalize the direction vector to ensure consistent speed in all directions
-    // sprite.move(velocity.x * normalize(velocity) * deltaTime);
+    return sprite;
 }
