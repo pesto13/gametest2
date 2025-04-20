@@ -7,8 +7,8 @@
 
 namespace teddy
 {
-    const float jumpForce = -900.0f;      // Forza iniziale del salto (negativa perché va verso l'alto) - regolabile
-    const float gravity = 980.0f;         // Forza di gravità (pixel/secondo^2) - puoi regolarla
+    const float jumpForce = -2200.0f;     // Forza iniziale del salto (negativa perché va verso l'alto) - regolabile
+    const float gravity = 5000.0f;        // Forza di gravità (pixel/secondo^2) - puoi regolarla
     const float lateralVelocity = 500.0f; // Velocità di movimento (pixel/secondo) - puoi regolarla
     const float scaleFactor = 0.5f;       // Fattore di scala dello sprite - puoi regolarlo
 } // namespace teddy
