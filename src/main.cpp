@@ -25,7 +25,7 @@ int main()
     rect.setFillColor(sf::Color::Red); // Set the color of the rectangle
     rect.setPosition({100, 500});      // Set the position of the rectangle
 
-    // CollisionSystem collisionSystem;                            // Create an instance of the collision system
+    CollisionSystem collisionSystem;                            // Create an instance of the collision system
     std::vector<sf::RectangleShape> obstacles = {rect, ground}; // List of obstacles (rectangles)
 
     sf::Clock clock; // This clock will track the time elapsed
@@ -48,8 +48,8 @@ int main()
         // Clear the screen (do this ONCE per frame, AFTER processing all events)
         window.clear(sf::Color::Black);
 
-        teddy.input(delta); // Handle input for the sprite
-        // collisionSystem.checkCollisions(teddy, obstacles); // Check for collisions
+        teddy.input(delta);                                // Handle input for the sprite
+        collisionSystem.checkCollisions(teddy, obstacles); // Check for collisions
         // Draw the shape
         teddy.update(delta);
         teddy.drawWithOutline(window, sf::Color::Red, 5.0f); // Esempio con contorno rosso di spessore approssimativo

@@ -18,13 +18,6 @@ Sprite2d::Sprite2d(const std::map<AnimationState, std::string> &animationFolders
         }
     }
 
-    // TODO
-    // // Imposta la texture iniziale se ci sono animazioni
-    // if (!textures.empty() && !textures[AnimationState::IDLE].empty())
-    // {
-    //     sprite.setTexture(textures[AnimationState::IDLE][0]);
-    // }
-
     sprite.setScale({scaleFactor, scaleFactor});
 }
 
